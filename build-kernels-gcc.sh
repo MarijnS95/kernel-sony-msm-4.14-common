@@ -6,7 +6,7 @@ export KERNEL_TMP=$ANDROID_ROOT/out/kernel-tmp
 # Cross Compiler
 export CROSS_COMPILE=$ANDROID_ROOT/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-
 # Mkdtimg tool
-export MKDTIMG=$ANDROID_ROOT/out/host/linux-x86/bin/mkdtimg
+export MKDTIMG=$ANDROID_ROOT/prebuilts/misc/linux-x86/libufdt/mkdtimg
 # Build command
 export BUILD="make O=$KERNEL_TMP ARCH=arm64 CROSS_COMPILE=$CROSS_COMPILE -j$(nproc)"
 # Copy prebuilt kernel
