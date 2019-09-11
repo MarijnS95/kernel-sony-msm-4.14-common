@@ -1,7 +1,7 @@
 cd ../../../..
 export ANDROID_ROOT=$(pwd)
 export KERNEL_TOP=$ANDROID_ROOT/kernel/sony/msm-4.14
-export KERNEL_TMP=$ANDROID_ROOT/out/kernel-tmp
+export KERNEL_TMP=$ANDROID_ROOT/out/kernel-414-clang
 
 # Cross Compiler
 export GCC_CC=$ANDROID_ROOT/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-
@@ -9,12 +9,6 @@ export CLANG_CC=$ANDROID_ROOT/prebuilts/clang/host/linux-x86/clang-r353983c/bin/
 
 # Mkdtimg tool
 export MKDTIMG=$ANDROID_ROOT/prebuilts/misc/linux-x86/libufdt/mkdtimg
-
-# Build command
-export BUILD="make O=$KERNEL_TMP ARCH=arm64 CC=$CLANG_CC CLANG_TRIPLE=aarch64-linux-gnu CROSS_COMPILE=$GCC_CC -j$(nproc)"
-
-# Copy prebuilt kernel
-export CP_BLOB="cp $KERNEL_TMP/arch/arm64/boot/Image.gz-dtb $KERNEL_TOP/common-kernel/kernel-dtb"
 
 
 # Check if mkdtimg tool exists
@@ -70,13 +64,19 @@ kumano)
 esac
 
 for device in $DEVICE; do \
-    ret=$(rm -rf ${KERNEL_TMP} 2>&1);
-    ret=$(mkdir -p ${KERNEL_TMP} 2>&1);
-    if [ ! -d ${KERNEL_TMP} ] ; then
+    DEVICE_TMP=$KERNEL_TMP/${device}-clang
+    ret=$(mkdir -p ${DEVICE_TMP} 2>&1);
+    if [ ! -d ${DEVICE_TMP} ] ; then
         echo "Check your environment";
         echo "ERROR: ${ret}";
         exit 1;
     fi
+
+    # Build command
+    BUILD="make O=$DEVICE_TMP ARCH=arm64 CC=$CLANG_CC CLANG_TRIPLE=aarch64-linux-gnu CROSS_COMPILE=$GCC_CC -j$(nproc)"
+
+    # Copy prebuilt kernel
+    CP_BLOB="cp $DEVICE_TMP/arch/arm64/boot/Image.gz-dtb $KERNEL_TOP/common-kernel/kernel-dtb"
 
     echo "================================================="
     echo "Platform -> ${platform} :: Device -> $device"
@@ -87,8 +87,9 @@ for device in $DEVICE; do \
 
     echo "The build may take up to 10 minutes. Please be patient ..."
     echo "Building new kernel image ..."
-    echo "Logging to $KERNEL_TMP/build_log_${device}"
-    $BUILD >$KERNEL_TMP/build_log_${device} 2>&1;
+    LOG_FILE=$KERNEL_TMP/build_log_${device}_clang
+    echo "Logging to $LOG_FILE"
+    $BUILD >$LOG_FILE 2>&1;
 
     echo "Copying new kernel image ..."
     ret=$(${CP_BLOB}-${device} 2>&1);
@@ -96,7 +97,7 @@ for device in $DEVICE; do \
         *"error"*|*"ERROR"*) echo "ERROR: $ret"; exit 1;;
     esac
     if [ $DTBO = "true" ]; then
-        $MKDTIMG create $KERNEL_TOP/common-kernel/dtbo-$device\.img `find $KERNEL_TMP/arch/arm64/boot/dts -name "*.dtbo"`
+        $MKDTIMG create $KERNEL_TOP/common-kernel/dtbo-$device\.img `find $DEVICE_TMP/arch/arm64/boot/dts -name "*.dtbo"`
     fi
 done
 done
@@ -108,4 +109,3 @@ unset ANDROID_ROOT
 unset KERNEL_TOP
 unset KERNEL_CFG
 unset KERNEL_TMP
-unset BUILD
