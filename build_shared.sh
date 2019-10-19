@@ -1,4 +1,4 @@
-export ANDROID_ROOT="$PWD"
+ANDROID_ROOT="$PWD"
 
 LOIRE="suzu kugo blanc"
 TONE="dora kagura keyaki"
@@ -11,12 +11,12 @@ KUMANO="bahamut griffin"
 PLATFORMS="loire tone yoshino nile ganges tama kumano"
 
 # Mkdtimg tool
-export MKDTIMG=$ANDROID_ROOT/prebuilts/misc/linux-x86/libufdt/mkdtimg
+MKDTIMG=$ANDROID_ROOT/prebuilts/misc/linux-x86/libufdt/mkdtimg
 # Copy prebuilt kernel
-export CP_BLOB="cp $KERNEL_TMP/arch/arm64/boot/Image.gz-dtb $KERNEL_TOP/common-kernel/kernel-dtb"
+CP_BLOB="cp $KERNEL_TMP/arch/arm64/boot/Image.gz-dtb $KERNEL_TOP/common-kernel/kernel-dtb"
 
-export KERNEL_TOP=$ANDROID_ROOT/kernel/sony/msm-4.14
-export KERNEL_TMP=$ANDROID_ROOT/out/kernel-tmp
+KERNEL_TOP=$ANDROID_ROOT/kernel/sony/msm-4.14
+KERNEL_TMP=$ANDROID_ROOT/out/kernel-tmp
 
 # Check if mkdtimg tool exists
 if [ ! -f "$MKDTIMG" ]; then
@@ -101,8 +101,3 @@ done
 echo "================================================="
 echo "Clean up environment"
 echo "Done!"
-unset ANDROID_ROOT
-unset KERNEL_TOP
-unset KERNEL_CFG
-unset KERNEL_TMP
-unset BUILD
