@@ -1,4 +1,4 @@
-export ANDROID_ROOT=$(pwd)
+export ANDROID_ROOT=$PWD
 
 LOIRE="suzu kugo blanc"
 TONE="dora kagura keyaki"
