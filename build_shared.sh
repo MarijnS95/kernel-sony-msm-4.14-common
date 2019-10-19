@@ -1,5 +1,7 @@
-ANDROID_ROOT="$PWD"
+# exit on any error
+set -e
 
+ANDROID_ROOT="$PWD"
 LOIRE="suzu kugo blanc"
 TONE="dora kagura keyaki"
 YOSHINO="lilac maple poplar"
@@ -65,20 +67,12 @@ for platform in $PLATFORMS; do \
     esac
 
     for device in $DEVICE; do \
-        ret=$(rm -rf ${KERNEL_TMP} 2>&1);
-        ret=$(mkdir -p ${KERNEL_TMP} 2>&1);
-        if [ ! -d ${KERNEL_TMP} ] ; then
-            echo "Check your environment";
-            echo "ERROR: ${ret}";
-            exit 1;
-        fi
+        rm -rf ${KERNEL_TMP}
+        mkdir -p ${KERNEL_TMP}
 
         echo "================================================="
         echo "Platform -> ${platform} :: Device -> $device"
-        ret=$(${BUILD} aosp_"$platform"_"$device"_defconfig 2>&1);
-        case "$ret" in
-            *"error"*|*"ERROR"*) echo "ERROR: $ret"; exit 1;;
-        esac
+        ${BUILD} aosp_"$platform"_"$device"_defconfig
 
         echo "The build may take up to 10 minutes. Please be patient ..."
         echo "Building new kernel image ..."
@@ -87,10 +81,8 @@ for platform in $PLATFORMS; do \
         $BUILD >"$LOG_FILE" 2>&1;
 
         echo "Copying new kernel image ..."
-        ret=$("${CP_BLOB}-${device}" 2>&1);
-        case "$ret" in
-            *"error"*|*"ERROR"*) echo "ERROR: $ret"; exit 1;;
-        esac
+        "${CP_BLOB}-${device}"
+
         if [ $DTBO = "true" ]; then
             $MKDTIMG create "$KERNEL_TOP/common-kernel/dtbo-$device.img" "$(find "$KERNEL_TMP"/arch/arm64/boot/dts -name "*.dtbo")"
         fi
