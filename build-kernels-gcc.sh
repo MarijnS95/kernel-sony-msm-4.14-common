@@ -1,10 +1,14 @@
 cd ../../../..
 export ANDROID_ROOT=$(pwd)
 export kernel_top=$ANDROID_ROOT/kernel/sony/msm-4.14
-export kernel_tmp=$ANDROID_ROOT/out/kernel-tmp
+export kernel_tmp=$ANDROID_ROOT/out/kernel-414-gcc
+
+export USE_CCACHE=1
+export CCACHE_DIR="$HOME/.aosp-ccache"
+export CCACHE_COMPRESS=1
 
 # Cross Compiler
-export CROSS_COMPILE=$ANDROID_ROOT/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-
+export CROSS_COMPILE=/data/gcc-linaro-7.4.1-2019.02-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
 # Mkdtimg tool
 export MKDTIMG=$ANDROID_ROOT/prebuilts/misc/linux-x86/libufdt/mkdtimg
 
@@ -62,7 +66,7 @@ kumano)
 esac
 
 for device in $DEVICE; do \
-    device_out=$kernel_tmp/${platform}_${device}_gcc
+    device_out=$kernel_tmp/${device}-gcc
     ret=$(mkdir -p $device_out 2>&1);
     if [ ! -d $device_out ] ; then
         echo "Check your environment";
@@ -71,7 +75,7 @@ for device in $DEVICE; do \
     fi
 
     # Build command
-    build="make O=$device_out ARCH=arm64 CROSS_COMPILE=$CROSS_COMPILE -j$(nproc)"
+    build="make O=$device_out ARCH=arm64 -j$(nproc)"
 
     # Copy prebuilt kernel
     CP_BLOB="cp $device_out/arch/arm64/boot/Image.gz-dtb $kernel_top/common-kernel/kernel-dtb"
@@ -87,7 +91,7 @@ for device in $DEVICE; do \
     echo "Building new kernel image ..."
     build_log="$kernel_tmp/build_log_${platform}_${device}_gcc"
     echo "Logging to $build_log"
-    $build >$build_log 2>&1;
+    $build CROSS_COMPILE="/usr/bin/ccache $CROSS_COMPILE" >$build_log 2>&1;
 
     echo "Copying new kernel image ..."
     ret=$(${CP_BLOB}-${device} 2>&1);
