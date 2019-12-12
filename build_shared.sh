@@ -85,9 +85,13 @@ for platform in $PLATFORMS; do \
 
         echo "The build may take up to 10 minutes. Please be patient ..."
         echo "Building new kernel image ..."
-        LOG_FILE="$device_out/build_log"
-        echo "Logging to $LOG_FILE"
-        eval "$BUILD" >"$LOG_FILE" 2>&1;
+        if [ "$LOG_TO_FILE" = "true" ]; then
+            LOG_FILE="$device_out/build_log"
+            echo "Logging to $LOG_FILE"
+            eval "$BUILD" >"$LOG_FILE" 2>&1
+        else
+            eval "$BUILD"
+        fi
 
         # Copy prebuilt kernel
         echo "Copying new kernel image ..."
