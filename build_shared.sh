@@ -18,7 +18,7 @@ MKDTIMG=$ANDROID_ROOT/prebuilts/misc/linux-x86/libufdt/mkdtimg
 CP_BLOB="cp $KERNEL_TMP/arch/arm64/boot/Image.gz-dtb $KERNEL_TOP/common-kernel/kernel-dtb"
 
 KERNEL_TOP=$ANDROID_ROOT/kernel/sony/msm-4.14
-KERNEL_TMP=$ANDROID_ROOT/out/kernel-tmp
+KERNEL_TMP=$ANDROID_ROOT/out/kernel-414/$COMPILER_NAME
 
 # Check if mkdtimg tool exists
 if [ ! -f "$MKDTIMG" ]; then
