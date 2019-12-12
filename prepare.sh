@@ -6,3 +6,7 @@ if [ -z "$ANDROID_BUILD_TOP" ]; then
 else
     ANDROID_ROOT="$ANDROID_BUILD_TOP"
 fi
+
+export USE_CCACHE=1
+export CCACHE_DIR="$HOME/.aosp-ccache"
+export CCACHE_COMPRESS=1
