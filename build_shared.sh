@@ -14,8 +14,6 @@ PLATFORMS="loire tone yoshino nile ganges tama kumano"
 
 # Mkdtimg tool
 MKDTIMG=$ANDROID_ROOT/prebuilts/misc/linux-x86/libufdt/mkdtimg
-# Copy prebuilt kernel
-CP_BLOB="cp $KERNEL_TMP/arch/arm64/boot/Image.gz-dtb $KERNEL_TOP/common-kernel/kernel-dtb"
 
 KERNEL_TOP=$ANDROID_ROOT/kernel/sony/msm-4.14
 KERNEL_TMP=$ANDROID_ROOT/out/kernel-414/$COMPILER_NAME
@@ -67,25 +65,31 @@ for platform in $PLATFORMS; do \
     esac
 
     for device in $DEVICE; do \
-        rm -rf ${KERNEL_TMP}
-        mkdir -p ${KERNEL_TMP}
+        device_out=$KERNEL_TMP/$device
+        mkdir -p "$device_out"
+
+        BUILD="make O=$device_out ARCH=arm64 $BUILD_ARGS -j$(nproc)"
 
         echo "================================================="
         echo "Platform -> ${platform} :: Device -> $device"
-        ${BUILD} aosp_"$platform"_"$device"_defconfig
+        echo "Building with $BUILD"
+        $BUILD aosp_"$platform"_"$device"_defconfig
 
         echo "The build may take up to 10 minutes. Please be patient ..."
         echo "Building new kernel image ..."
-        LOG_FILE="$KERNEL_TMP/build_log_$device"
+        LOG_FILE="$device_out/build_log"
         echo "Logging to $LOG_FILE"
         $BUILD >"$LOG_FILE" 2>&1;
 
+        # Copy prebuilt kernel
         echo "Copying new kernel image ..."
-        "${CP_BLOB}-${device}"
+        cp "$device_out/arch/arm64/boot/Image.gz-dtb" "$KERNEL_TOP/common-kernel/kernel-dtb-${device}"
 
         if [ $DTBO = "true" ]; then
-            $MKDTIMG create "$KERNEL_TOP/common-kernel/dtbo-$device.img" "$(find "$KERNEL_TMP"/arch/arm64/boot/dts -name "*.dtbo")"
+            $MKDTIMG create "$KERNEL_TOP/common-kernel/dtbo-$device.img" "$(find "$device_out/arch/arm64/boot/dts" -name "*.dtbo")"
         fi
+
+        [ "$CLEAN_AFTER_BUILD" != "true" ] || rm -rf "$device_out"
     done
 done
 
