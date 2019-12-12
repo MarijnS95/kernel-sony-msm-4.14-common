@@ -73,13 +73,18 @@ for platform in $PLATFORMS; do \
         echo "================================================="
         echo "Platform -> ${platform} :: Device -> $device"
         echo "Building with $BUILD"
-        $BUILD aosp_"$platform"_"$device"_defconfig
+
+        # Eval to preserve quoting _within_ the BUILD variable
+        # Useful when it contains something like
+        # BUILD_ARGS="CC=\"ccache path/to/gcc\""
+
+        eval "$BUILD" aosp_"$platform"_"$device"_defconfig
 
         echo "The build may take up to 10 minutes. Please be patient ..."
         echo "Building new kernel image ..."
         LOG_FILE="$device_out/build_log"
         echo "Logging to $LOG_FILE"
-        $BUILD >"$LOG_FILE" 2>&1;
+        eval "$BUILD" >"$LOG_FILE" 2>&1;
 
         # Copy prebuilt kernel
         echo "Copying new kernel image ..."
