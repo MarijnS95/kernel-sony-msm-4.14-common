@@ -1,7 +1,8 @@
+#! /usr/bin/bash
+
 # exit on any error
 set -e
 
-ANDROID_ROOT="$PWD"
 LOIRE="suzu kugo blanc"
 TONE="dora kagura keyaki"
 YOSHINO="lilac maple poplar"
@@ -17,6 +18,8 @@ MKDTIMG=$ANDROID_ROOT/prebuilts/misc/linux-x86/libufdt/mkdtimg
 
 KERNEL_TOP=$ANDROID_ROOT/kernel/sony/msm-4.14
 KERNEL_TMP=$ANDROID_ROOT/out/kernel-414/$COMPILER_NAME
+
+cd "$ANDROID_ROOT"
 
 # Check if mkdtimg tool exists
 if [ ! -f "$MKDTIMG" ]; then

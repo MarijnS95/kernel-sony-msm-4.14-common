@@ -1,5 +1,6 @@
-cd ../../../..
-ANDROID_ROOT=$(pwd)
+#! /usr/bin/bash
+
+. ./prepare.sh
 
 # Cross Compiler
 GCC_CC=$ANDROID_ROOT/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-
@@ -11,4 +12,4 @@ BUILD_ARGS="CROSS_COMPILE=\"$GCC_CC\" CC=\"$CLANG_CC\" CLANG_TRIPLE=aarch64-linu
 COMPILER_NAME=clang
 
 # source shared parts
-. "$OLDPWD"/build_shared.sh
+. ./build_shared.sh
