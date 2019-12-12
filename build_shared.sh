@@ -11,7 +11,7 @@ KUMANO="bahamut griffin"
 PLATFORMS="loire tone yoshino nile ganges tama kumano"
 
 # Mkdtimg tool
-export MKDTIMG=$ANDROID_ROOT/out/host/linux-x86/bin/mkdtimg
+export MKDTIMG=$ANDROID_ROOT/prebuilts/misc/linux-x86/libufdt/mkdtimg
 # Copy prebuilt kernel
 export CP_BLOB="cp $KERNEL_TMP/arch/arm64/boot/Image.gz-dtb $KERNEL_TOP/common-kernel/kernel-dtb"
 
@@ -19,11 +19,15 @@ export KERNEL_TOP=$ANDROID_ROOT/kernel/sony/msm-4.14
 export KERNEL_TMP=$ANDROID_ROOT/out/kernel-tmp
 
 # Check if mkdtimg tool exists
-if [ ! -f $MKDTIMG ]; then
-    echo "mkdtimg: File not found!"
-    echo "Building mkdtimg"
-    export ALLOW_MISSING_DEPENDENCIES=true
-    make mkdtimg
+if [ ! -f "$MKDTIMG" ]; then
+    echo "Prebuilt mkdtimg $MKDTIMG not found!"
+    export MKDTIMG=$ANDROID_ROOT/out/host/linux-x86/bin/mkdtimg
+    if [ ! -f "$MKDTIMG" ]; then
+        echo "mkdtimg: File not found!"
+        echo "Building mkdtimg"
+        export ALLOW_MISSING_DEPENDENCIES=true
+        make mkdtimg
+    fi
 fi
 
 cd $KERNEL_TOP/kernel
